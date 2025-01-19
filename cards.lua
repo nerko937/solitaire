@@ -1,3 +1,5 @@
+require("card")
+
 love.graphics.setDefaultFilter("nearest")
 local Cards = {}
 
@@ -17,14 +19,11 @@ function Cards:init()
 				assetNo = "0" .. assetNo
 			end
 			love.graphics.setDefaultFilter("nearest")
-			table.insert(self.deck, {
-				suit = suit,
-				no = i,
-				img = love.graphics.newImage(string.format("assets/%s/%s_card_%s.png", suit, suit, assetNo)),
-			})
+            local card = Card:new(nil, 0, 0, i, suit, love.graphics.newImage(string.format("assets/%s/%s_card_%s.png", suit, suit, assetNo)))
+			table.insert(self.deck, card)
 		end
 	end
-	shuffleInPlace(self.deck)
+	-- shuffleInPlace(self.deck)
 	return self
 end
 
@@ -36,23 +35,20 @@ local cardX, cardY, cardClickX, cardClickY, cardRestX, cardRestY = 50, 50, 50, 5
 local isHeld = false
 
 function Cards:holdTopFromPile(x, y, pile, isTableau)
-    local cardY = pile.y
-    if isTableau then
-        cardY = cardY + self.getYCoordSpacing(#pile.cards)
-    end
+    local card = table.remove(pile.cards)
 	self.held = {
-		mouseInCardX = x - pile.x,
-		mouseInCardY = y - cardY,
-		x = pile.x,
-		y = cardY,
-		card = table.remove(pile.cards),
+		mouseInCardX = x - card.x,
+		mouseInCardY = y - card.y,
+		card = card,
 		takenFrom = pile,
+        prevX = card.x,
+        prevY = card.y,
 	}
 end
 
 function Cards:getHeldCoords()
     if self.held then
-        return {x = self.held.x, y = self.held.y}
+        return {x = self.held.card.x, y = self.held.card.y}
     end
     return {x = -100, y = -100}
 end
@@ -62,27 +58,33 @@ function Cards:releaseHeld(newPile)
 		return
 	end
     if not newPile then
+        self.held.card.x = self.held.prevX
+        self.held.card.y = self.held.prevY
         table.insert(self.held.takenFrom.cards, self.held.card)
     else
         local canBePutted = false
         local last = newPile.cards[#newPile.cards]
         if last then
-            if self.held.card.suit == "Hearts" or self.held.card.suit == "Diamonds" then
-                if last.suit == "Clubs" or last.suit == "Spades" then
-                    canBePutted = true
-                end
-            else
-                if last.suit == "Hearts" or last.suit == "Diamonds" then
-                    canBePutted = true
-                end
+            if (self.held.card:isRedSuit() and last:isBlackSuit()) or (self.held.card:isBlackSuit() and last:isRedSuit()) then
+                canBePutted = true
             end
         end
         if canBePutted and self.held.card.no == last.no - 1 then
+            self.held.card.isRevealed = true
+            self.held.card.x = newPile.x
+            self.held.card.y = newPile.y + (self.held.card.YSPACING * #newPile.cards)
+            self.held.card:unsetUnderTopTableauCard()
             table.insert(newPile.cards, self.held.card)
-            if self.held.takenFrom.visibleIndex then
-                self.held.takenFrom.visibleIndex = self.held.takenFrom.visibleIndex - 1
+            if #self.held.takenFrom.cards ~= 0 then
+                for _, card in ipairs(self.held.takenFrom.cards) do
+                    card:setUnderTopTableauCard()
+                end
+                self.held.takenFrom.cards[#self.held.takenFrom.cards].isRevealed = true
+                self.held.takenFrom.cards[#self.held.takenFrom.cards]:unsetUnderTopTableauCard()
             end
         else
+            self.held.card.x = self.held.prevX
+            self.held.card.y = self.held.prevY
             table.insert(self.held.takenFrom.cards, self.held.card)
         end
     end
@@ -118,14 +120,14 @@ function Cards:mouseMoved(x, y)
 	if not self.held then
 		return
 	end
-	self.held.x = x - self.held.mouseInCardX
-	self.held.y = y - self.held.mouseInCardY
+	self.held.card.x = x - self.held.mouseInCardX
+	self.held.card.y = y - self.held.mouseInCardY
 end
 
 function Cards:draw()
 	if not self.held then
 		return
 	end
-	love.graphics.draw(self.held.card.img, self.held.x, self.held.y)
+	love.graphics.draw(self.held.card:getImg(), self.held.card.x, self.held.card.y)
 end
 return Cards
