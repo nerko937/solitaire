@@ -1,4 +1,4 @@
-require("card")
+Card = require("card")
 
 love.graphics.setDefaultFilter("nearest")
 local Cards = {}

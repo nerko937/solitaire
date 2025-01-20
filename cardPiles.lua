@@ -1,3 +1,4 @@
+Card = require('card')
 love.graphics.setDefaultFilter("nearest")
 local placeholder = love.graphics.newImage("assets/Placeholder.png")
 local back = love.graphics.newImage("assets/Backs/back_0.png")
@@ -33,6 +34,7 @@ function Piles:init(cards)
 		x = start,
 		y = start,
 		cards = {},
+        placeholder = Card:new(nil, start, start, nil, nil, placeholder, true)
 	}
 	self.waste = {
 		x = start + step,
@@ -43,21 +45,25 @@ function Piles:init(cards)
 		x = start + step * 3,
 		y = start,
 		cards = {},
+        placeholder = Card:new(nil, start + step * 3, start, nil, nil, placeholder, true)
 	}
 	self.clubsFoundation = {
 		x = start + step * 4,
 		y = start,
 		cards = {},
+        placeholder = Card:new(nil, start + step * 4, start, nil, nil, placeholder, true)
 	}
 	self.diamondsFoundation = {
 		x = start + step * 5,
 		y = start,
 		cards = {},
+        placeholder = Card:new(nil, start + step * 5, start, nil, nil, placeholder, true)
 	}
 	self.spadesFoundation = {
 		x = start + step * 6,
 		y = start,
 		cards = {},
+        placeholder = Card:new(nil, start + step * 6, start, nil, nil, placeholder, true)
 	}
 	local secRowY = (start * 3) + (placeholder:getHeight())
 	for i = start, WIDTH, step do
@@ -65,6 +71,7 @@ function Piles:init(cards)
 			x = i,
 			y = secRowY,
 			cards = {},
+            placeholder = Card:new(nil, i, secRowY, nil, nil, placeholder, true)
 		})
 	end
 	for index, tableau in ipairs(self.tableaus) do
@@ -91,13 +98,13 @@ end
 function Piles:draw()
 	local function drawCardPlaceholders()
 		love.graphics.setColor(love.math.colorFromBytes(0, 51, 0))
-		love.graphics.draw(placeholder, self.heartsFoundation.x, self.heartsFoundation.y)
-		love.graphics.draw(placeholder, self.clubsFoundation.x, self.clubsFoundation.y)
-		love.graphics.draw(placeholder, self.diamondsFoundation.x, self.diamondsFoundation.y)
-		love.graphics.draw(placeholder, self.spadesFoundation.x, self.spadesFoundation.y)
-		love.graphics.draw(placeholder, self.stock.x, self.stock.y)
+		love.graphics.draw(self.heartsFoundation.placeholder:getImg(), self.heartsFoundation.placeholder.x, self.heartsFoundation.placeholder.y)
+		love.graphics.draw(self.clubsFoundation.placeholder:getImg(), self.clubsFoundation.placeholder.x, self.clubsFoundation.placeholder.y)
+		love.graphics.draw(self.diamondsFoundation.placeholder:getImg(), self.diamondsFoundation.placeholder.x, self.diamondsFoundation.placeholder.y)
+		love.graphics.draw(self.spadesFoundation.placeholder:getImg(), self.spadesFoundation.placeholder.x, self.spadesFoundation.placeholder.y)
+		love.graphics.draw(self.stock.placeholder:getImg(), self.stock.placeholder.x, self.stock.placeholder.y)
 		for _, tableau in ipairs(self.tableaus) do
-			love.graphics.draw(placeholder, tableau.x, tableau.y)
+			love.graphics.draw(tableau.placeholder:getImg(), tableau.placeholder.x, tableau.placeholder.y)
 		end
 	end
 
@@ -167,8 +174,7 @@ function Piles:mousePressed(x, y, button)
 	end
 
 	local function handleStockClick()
-        local last = self.stock.cards[#self.stock.cards]
-        if not(last and last:beenClicked(x, y)) then
+        if not self.stock.placeholder:beenClicked(x, y) then
             return
         end
 		local card = table.remove(self.stock.cards)

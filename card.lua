@@ -2,7 +2,7 @@ local back = love.graphics.newImage("assets/Backs/back_0.png")
 
 Card = {}
 
-function Card:new (o, x, y, no, suit, img)
+function Card:new (o, x, y, no, suit, img, isRevealed)
    o = o or {}
    o.x = x
    o.y = y
@@ -11,7 +11,7 @@ function Card:new (o, x, y, no, suit, img)
    o._front = img
    o._w = back:getWidth()
    o._h = back:getHeight()
-   o.isRevealed = false
+   o.isRevealed = isRevealed or false
    o._isUnderTopTableauCard = false
    o.YSPACING = 7
    setmetatable(o, self)
@@ -62,3 +62,5 @@ function Card:beenClicked(clickX, clickY)
 	end
 	return true
 end
+
+return Card
