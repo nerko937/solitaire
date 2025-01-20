@@ -1,4 +1,5 @@
 Card = require('card')
+Hold = require('hold')
 love.graphics.setDefaultFilter("nearest")
 local placeholder = love.graphics.newImage("assets/Placeholder.png")
 local back = love.graphics.newImage("assets/Backs/back_0.png")
@@ -26,8 +27,7 @@ Piles = {
 	tableaus = {},
 }
 
-function Piles:init(cards)
-	self.cards = cards
+function Piles:init(deck)
 	local step = WIDTH / 7
 	local start = (step - (placeholder:getWidth())) / 2
 	self.stock = {
@@ -76,7 +76,7 @@ function Piles:init(cards)
 	end
 	for index, tableau in ipairs(self.tableaus) do
 		for innerIndex = 1, index, 1 do
-            local card = table.remove(self.cards.deck)
+            local card = table.remove(deck)
             card.x = tableau.x
             card.y = tableau.y + (card.YSPACING * (innerIndex - 1))
             if innerIndex == index then
@@ -87,11 +87,11 @@ function Piles:init(cards)
 			table.insert(tableau.cards, card)
 		end
 	end
-    for _, card in ipairs(self.cards.deck) do
+    for _, card in ipairs(deck) do
         card.x = self.stock.x
         card.y = self.stock.y
     end
-	self.stock.cards = self.cards.deck
+	self.stock.cards = deck
 	return self
 end
 
@@ -164,11 +164,11 @@ function Piles:mousePressed(x, y, button)
 	local function initCardMove()
 		for _, tableau in ipairs(self.tableaus) do
             if #tableau.cards ~= 0 and tableau.cards[#tableau.cards]:beenClicked(x, y) then
-               self.cards:holdTopFromPile(x, y, tableau, true)
+               Hold.holdTopFromPile(x, y, tableau)
             end
 		end
         if #self.waste.cards ~= 0 and self.waste.cards[#self.waste.cards]:beenClicked(x, y) then
-			self.cards:holdTopFromPile(x, y, self.waste)
+               Hold.holdTopFromPile(x, y, self.waste)
 			return
         end
 	end
@@ -212,16 +212,16 @@ function Piles:mouseReleased(x, y, button)
         if #tableau.cards > 0 then
             target = tableau.cards[#tableau.cards]
         end
-		local area = overlappingArea(self.cards:getHeldCoords(), target)
+		local area = overlappingArea(Hold.getHeldCoords(), target)
 		if area > biggestArea then
 			biggestArea = area
 			biggestAreaObj = tableau
 		end
 	end
 	if biggestArea == 0 then
-        self.cards:releaseHeld()
+        Hold.releaseHeld()
 	else
-        self.cards:releaseHeld(biggestAreaObj)
+        Hold.releaseHeld(biggestAreaObj)
         for _, card in ipairs(biggestAreaObj.cards) do
             card:setUnderTopTableauCard()
         end
