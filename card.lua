@@ -1,3 +1,4 @@
+love.graphics.setDefaultFilter("nearest")
 local back = love.graphics.newImage("assets/Backs/back_0.png")
 
 Card = {}
