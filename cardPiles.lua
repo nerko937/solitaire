@@ -31,45 +31,32 @@ function Piles:init(deck)
 	local step = WIDTH / 7
 	local start = (step - (placeholder:getWidth())) / 2
 	self.stock = {
-		x = start,
-		y = start,
 		cards = {},
         placeholder = Card:new(nil, start, start, nil, nil, placeholder, true)
 	}
 	self.waste = {
-		x = start + step,
-		y = start,
 		cards = {},
+        placeholder = Card:new(nil, start + step, start, nil, nil, placeholder, true)
 	}
 	self.heartsFoundation = {
-		x = start + step * 3,
-		y = start,
 		cards = {},
         placeholder = Card:new(nil, start + step * 3, start, nil, nil, placeholder, true)
 	}
 	self.clubsFoundation = {
-		x = start + step * 4,
-		y = start,
 		cards = {},
         placeholder = Card:new(nil, start + step * 4, start, nil, nil, placeholder, true)
 	}
 	self.diamondsFoundation = {
-		x = start + step * 5,
-		y = start,
 		cards = {},
         placeholder = Card:new(nil, start + step * 5, start, nil, nil, placeholder, true)
 	}
 	self.spadesFoundation = {
-		x = start + step * 6,
-		y = start,
 		cards = {},
         placeholder = Card:new(nil, start + step * 6, start, nil, nil, placeholder, true)
 	}
 	local secRowY = (start * 3) + (placeholder:getHeight())
 	for i = start, WIDTH, step do
 		table.insert(self.tableaus, {
-			x = i,
-			y = secRowY,
 			cards = {},
             placeholder = Card:new(nil, i, secRowY, nil, nil, placeholder, true)
 		})
@@ -77,8 +64,8 @@ function Piles:init(deck)
 	for index, tableau in ipairs(self.tableaus) do
 		for innerIndex = 1, index, 1 do
             local card = table.remove(deck)
-            card.x = tableau.x
-            card.y = tableau.y + (card.YSPACING * (innerIndex - 1))
+            card.x = tableau.placeholder.x
+            card.y = tableau.placeholder.y + (card.YSPACING * (innerIndex - 1))
             if innerIndex == index then
                 card.isRevealed = true
             else
@@ -88,8 +75,8 @@ function Piles:init(deck)
 		end
 	end
     for _, card in ipairs(deck) do
-        card.x = self.stock.x
-        card.y = self.stock.y
+        card.x = self.stock.placeholder.x
+        card.y = self.stock.placeholder.y
     end
 	self.stock.cards = deck
 	return self
@@ -120,9 +107,10 @@ function Piles:draw()
 	end
 
 	local function drawStock()
-		if #self.stock.cards > 0 then
-			love.graphics.draw(back, self.stock.x, self.stock.y)
-		end
+        local top = self.stock.cards[#self.stock.cards]
+        if top then
+			love.graphics.draw(top:getImg(), top.x, top.y)
+        end
 	end
 
 	local function drawWaste()
@@ -163,13 +151,15 @@ end
 function Piles:mousePressed(x, y, button)
 	local function initCardMove()
 		for _, tableau in ipairs(self.tableaus) do
-            if #tableau.cards ~= 0 and tableau.cards[#tableau.cards]:beenClicked(x, y) then
+            local tableauTop = tableau.cards[#tableau.cards]
+            if tableauTop and tableauTop:beenClicked(x, y) then
                Hold.holdTopFromPile(x, y, tableau)
             end
 		end
-        if #self.waste.cards ~= 0 and self.waste.cards[#self.waste.cards]:beenClicked(x, y) then
-               Hold.holdTopFromPile(x, y, self.waste)
-			return
+        local wasteTop = self.waste.cards[#self.waste.cards]
+        if wasteTop and wasteTop:beenClicked(x, y) then
+            Hold.holdTopFromPile(x, y, self.waste)
+            return
         end
 	end
 
@@ -180,14 +170,14 @@ function Piles:mousePressed(x, y, button)
 		local card = table.remove(self.stock.cards)
 		if card then
 			table.insert(self.waste.cards, card)
-            card.x = self.waste.x
-            card.y = self.waste.y
+            card.x = self.waste.placeholder.x
+            card.y = self.waste.placeholder.y
             card.isRevealed = true
 		else
 			self.stock.cards = reverseTable(self.waste.cards)
             for _, stockCard in ipairs(self.stock.cards) do
-                stockCard.x = self.stock.x
-                stockCard.y = self.stock.y
+                stockCard.x = self.stock.placeholder.x
+                stockCard.y = self.stock.placeholder.y
                 stockCard.isRevealed = false
             end
 			self.waste.cards = {}
@@ -208,9 +198,9 @@ function Piles:mouseReleased(x, y, button)
 	end
 	local biggestAreaObj, biggestArea = nil, 0
 	for _, tableau in ipairs(self.tableaus) do
-        local target = tableau
-        if #tableau.cards > 0 then
-            target = tableau.cards[#tableau.cards]
+        local target = tableau.cards[#tableau.cards]
+        if not target then
+            target = tableau.placeholder
         end
 		local area = overlappingArea(Hold.getHeldCoords(), target)
 		if area > biggestArea then

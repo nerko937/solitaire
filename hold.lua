@@ -38,8 +38,8 @@ function Hold.releaseHeld(newTargetPile)
         end
         if canBePutted and held.card.no == last.no - 1 then
             held.card.isRevealed = true
-            held.card.x = newTargetPile.x
-            held.card.y = newTargetPile.y + (held.card.YSPACING * #newTargetPile.cards)
+            held.card.x = newTargetPile.placeholder.x
+            held.card.y = newTargetPile.placeholder.y + (held.card.YSPACING * #newTargetPile.cards)
             held.card:unsetUnderTopTableauCard()
             table.insert(newTargetPile.cards, held.card)
             if #held.takenFrom.cards ~= 0 then
