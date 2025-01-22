@@ -4,60 +4,45 @@ love.graphics.setDefaultFilter("nearest")
 local placeholder = love.graphics.newImage("assets/Placeholder.png")
 local WIDTH, _ = love.graphics.getDimensions()
 
-local function reverseTable(t)
-	local reversedTable = {}
-	local itemCount = #t
-	for k, v in ipairs(t) do
-		reversedTable[itemCount + 1 - k] = v
-	end
-	return reversedTable
-end
+local stock, waste, heartsFoundation, clubsFoundation, diamondsFoundation, spadesFoundation, tableaus
 
-Piles = {
-	heartsFoundation = {},
-	clubsFoundation = {},
-	diamondsFoundation = {},
-	spadesFoundation = {},
-	stock = {},
-	waste = {},
-	tableaus = {},
-}
-
-function Piles:init(deck)
+local function initPiles()
 	local step = WIDTH / 7
 	local start = (step - (placeholder:getWidth())) / 2
-	self.stock = {
+	local deck = require("deck")
+	stock = {
 		cards = {},
 		placeholder = Card:new(nil, start, start, nil, nil, placeholder, true),
 	}
-	self.waste = {
+	waste = {
 		cards = {},
 		placeholder = Card:new(nil, start + step, start, nil, nil, placeholder, true),
 	}
-	self.heartsFoundation = {
+	heartsFoundation = {
 		cards = {},
 		placeholder = Card:new(nil, start + step * 3, start, nil, nil, placeholder, true),
 	}
-	self.clubsFoundation = {
+	clubsFoundation = {
 		cards = {},
 		placeholder = Card:new(nil, start + step * 4, start, nil, nil, placeholder, true),
 	}
-	self.diamondsFoundation = {
+	diamondsFoundation = {
 		cards = {},
 		placeholder = Card:new(nil, start + step * 5, start, nil, nil, placeholder, true),
 	}
-	self.spadesFoundation = {
+	spadesFoundation = {
 		cards = {},
 		placeholder = Card:new(nil, start + step * 6, start, nil, nil, placeholder, true),
 	}
 	local secRowY = (start * 3) + (placeholder:getHeight())
+	tableaus = {}
 	for i = start, WIDTH, step do
-		table.insert(self.tableaus, {
+		table.insert(tableaus, {
 			cards = {},
 			placeholder = Card:new(nil, i, secRowY, nil, nil, placeholder, true),
 		})
 	end
-	for index, tableau in ipairs(self.tableaus) do
+	for index, tableau in ipairs(tableaus) do
 		for innerIndex = 1, index, 1 do
 			local card = table.remove(deck)
 			card.x = tableau.placeholder.x
@@ -71,45 +56,56 @@ function Piles:init(deck)
 		end
 	end
 	for _, card in ipairs(deck) do
-		card.x = self.stock.placeholder.x
-		card.y = self.stock.placeholder.y
+		card.x = stock.placeholder.x
+		card.y = stock.placeholder.y
 	end
-	self.stock.cards = deck
-	return self
+	stock.cards = deck
+end
+initPiles()
+
+local function reverseTable(t)
+	local reversedTable = {}
+	local itemCount = #t
+	for k, v in ipairs(t) do
+		reversedTable[itemCount + 1 - k] = v
+	end
+	return reversedTable
 end
 
-function Piles:draw()
+Piles = {}
+
+function Piles.draw()
 	local function drawCardPlaceholders()
 		love.graphics.setColor(love.math.colorFromBytes(0, 51, 0))
 		love.graphics.draw(
-			self.heartsFoundation.placeholder:getImg(),
-			self.heartsFoundation.placeholder.x,
-			self.heartsFoundation.placeholder.y
+			heartsFoundation.placeholder:getImg(),
+			heartsFoundation.placeholder.x,
+			heartsFoundation.placeholder.y
 		)
 		love.graphics.draw(
-			self.clubsFoundation.placeholder:getImg(),
-			self.clubsFoundation.placeholder.x,
-			self.clubsFoundation.placeholder.y
+			clubsFoundation.placeholder:getImg(),
+			clubsFoundation.placeholder.x,
+			clubsFoundation.placeholder.y
 		)
 		love.graphics.draw(
-			self.diamondsFoundation.placeholder:getImg(),
-			self.diamondsFoundation.placeholder.x,
-			self.diamondsFoundation.placeholder.y
+			diamondsFoundation.placeholder:getImg(),
+			diamondsFoundation.placeholder.x,
+			diamondsFoundation.placeholder.y
 		)
 		love.graphics.draw(
-			self.spadesFoundation.placeholder:getImg(),
-			self.spadesFoundation.placeholder.x,
-			self.spadesFoundation.placeholder.y
+			spadesFoundation.placeholder:getImg(),
+			spadesFoundation.placeholder.x,
+			spadesFoundation.placeholder.y
 		)
-		love.graphics.draw(self.stock.placeholder:getImg(), self.stock.placeholder.x, self.stock.placeholder.y)
-		for _, tableau in ipairs(self.tableaus) do
+		love.graphics.draw(stock.placeholder:getImg(), stock.placeholder.x, stock.placeholder.y)
+		for _, tableau in ipairs(tableaus) do
 			love.graphics.draw(tableau.placeholder:getImg(), tableau.placeholder.x, tableau.placeholder.y)
 		end
 	end
 
 	local function drawTableaus()
 		love.graphics.setColor(1, 1, 1)
-		for _, tableau in ipairs(self.tableaus) do
+		for _, tableau in ipairs(tableaus) do
 			local maxIter = #tableau.cards
 			for i = 1, maxIter, 1 do
 				local card = tableau.cards[i]
@@ -119,16 +115,16 @@ function Piles:draw()
 	end
 
 	local function drawStock()
-		local top = self.stock.cards[#self.stock.cards]
+		local top = stock.cards[#stock.cards]
 		if top then
 			love.graphics.draw(top:getImg(), top.x, top.y)
 		end
 	end
 
 	local function drawWaste()
-		local index = #self.waste.cards
+		local index = #waste.cards
 		if index > 0 then
-			local card = self.waste.cards[index]
+			local card = waste.cards[index]
 			love.graphics.draw(card:getImg(), card.x, card.y)
 		end
 	end
@@ -145,39 +141,39 @@ local function overlappingArea(first, sec)
 	return overlapX * overlapY
 end
 
-function Piles:mousePressed(x, y, button)
+function Piles.mousePressed(x, y, button)
 	local function initCardMove()
-		for _, tableau in ipairs(self.tableaus) do
+		for _, tableau in ipairs(tableaus) do
 			local tableauTop = tableau.cards[#tableau.cards]
 			if tableauTop and tableauTop:beenClicked(x, y) then
 				Hold.holdTopFromPile(x, y, tableau)
 			end
 		end
-		local wasteTop = self.waste.cards[#self.waste.cards]
+		local wasteTop = waste.cards[#waste.cards]
 		if wasteTop and wasteTop:beenClicked(x, y) then
-			Hold.holdTopFromPile(x, y, self.waste)
+			Hold.holdTopFromPile(x, y, waste)
 			return
 		end
 	end
 
 	local function handleStockClick()
-		if not self.stock.placeholder:beenClicked(x, y) then
+		if not stock.placeholder:beenClicked(x, y) then
 			return
 		end
-		local card = table.remove(self.stock.cards)
+		local card = table.remove(stock.cards)
 		if card then
-			table.insert(self.waste.cards, card)
-			card.x = self.waste.placeholder.x
-			card.y = self.waste.placeholder.y
+			table.insert(waste.cards, card)
+			card.x = waste.placeholder.x
+			card.y = waste.placeholder.y
 			card.isRevealed = true
 		else
-			self.stock.cards = reverseTable(self.waste.cards)
-			for _, stockCard in ipairs(self.stock.cards) do
-				stockCard.x = self.stock.placeholder.x
-				stockCard.y = self.stock.placeholder.y
+			stock.cards = reverseTable(waste.cards)
+			for _, stockCard in ipairs(stock.cards) do
+				stockCard.x = stock.placeholder.x
+				stockCard.y = stock.placeholder.y
 				stockCard.isRevealed = false
 			end
-			self.waste.cards = {}
+			waste.cards = {}
 		end
 	end
 
@@ -189,13 +185,13 @@ function Piles:mousePressed(x, y, button)
 	initCardMove()
 end
 
-function Piles:mouseReleased(x, y, button)
+function Piles.mouseReleased(x, y, button)
 	if button ~= 1 then
 		return
 	end
 	local biggestAreaObj, biggestArea, held = nil, 0, Hold.getHeldCard()
 	if held then
-		for _, tableau in ipairs(self.tableaus) do
+		for _, tableau in ipairs(tableaus) do
 			local target = tableau.cards[#tableau.cards]
 			if not target then
 				target = tableau.placeholder
