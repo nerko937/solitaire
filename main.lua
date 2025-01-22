@@ -18,7 +18,7 @@ function love.draw()
 	TLfres.beginRendering(CANVAS_WIDTH, CANVAS_HEIGHT)
 	DrawBackground()
 	piles:draw()
-    Hold.draw()
+	Hold.draw()
 	TLfres.endRendering()
 end
 
@@ -34,5 +34,5 @@ end
 
 function love.mousemoved(x, y)
 	local x, y = TLfres.getMousePosition(CANVAS_WIDTH, CANVAS_HEIGHT)
-    Hold.mouseMoved(x, y)
+	Hold.mouseMoved(x, y)
 end

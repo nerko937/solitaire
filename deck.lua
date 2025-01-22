@@ -13,15 +13,21 @@ love.graphics.setDefaultFilter("nearest")
 
 local suits = { "Hearts", "Clubs", "Diamonds", "Spades" }
 for i = 1, 13, 1 do
-    for _, suit in ipairs(suits) do
-        local assetNo = tostring(i)
-        if i < 10 then
-            assetNo = "0" .. assetNo
-        end
-        love.graphics.setDefaultFilter("nearest")
-        local card = Card:new(nil, 0, 0, i, suit, love.graphics.newImage(string.format("assets/%s/%s_card_%s.png", suit, suit, assetNo)))
-        table.insert(Deck, card)
-    end
+	for _, suit in ipairs(suits) do
+		local assetNo = tostring(i)
+		if i < 10 then
+			assetNo = "0" .. assetNo
+		end
+		local card = Card:new(
+			nil,
+			0,
+			0,
+			i,
+			suit,
+			love.graphics.newImage(string.format("assets/%s/%s_card_%s.png", suit, suit, assetNo))
+		)
+		table.insert(Deck, card)
+	end
 end
 -- shuffleInPlace(self.deck)
 
