@@ -1,6 +1,6 @@
 local TLfres = require("tlfres")
-local Piles = require("cardPiles")
-local Hold = require("hold")
+local Piles = require("cards.piles")
+local Hold = require("cards.hold")
 require("background")
 
 local CANVAS_WIDTH = 266

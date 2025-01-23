@@ -1,5 +1,5 @@
-Card = require("card")
-Hold = require("hold")
+Card = require("cards.card")
+Hold = require("cards.hold")
 love.graphics.setDefaultFilter("nearest")
 local placeholder = love.graphics.newImage("assets/Placeholder.png")
 local WIDTH, _ = love.graphics.getDimensions()
@@ -9,7 +9,7 @@ local stock, waste, heartsFoundation, clubsFoundation, diamondsFoundation, spade
 local function initPiles()
 	local step = WIDTH / 7
 	local start = (step - (placeholder:getWidth())) / 2
-	local deck = require("deck")
+	local deck = require("cards.deck")
 	stock = {
 		cards = {},
 		placeholder = Card:new(nil, start, start, nil, nil, placeholder, true),

@@ -1,4 +1,4 @@
-require("card")
+require("cards.card")
 
 local function shuffleInPlace(t)
 	for i = #t, 2, -1 do
