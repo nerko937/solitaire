@@ -106,9 +106,7 @@ function Piles.draw()
 	local function drawTableaus()
 		love.graphics.setColor(1, 1, 1)
 		for _, tableau in ipairs(tableaus) do
-			local maxIter = #tableau.cards
-			for i = 1, maxIter, 1 do
-				local card = tableau.cards[i]
+			for _, card in ipairs(tableau.cards) do
 				love.graphics.draw(card:getImg(), card.x, card.y)
 			end
 		end
