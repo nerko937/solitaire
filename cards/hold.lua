@@ -1,6 +1,23 @@
 Hold = {}
 local held
 
+function Hold.holdFrom(pile, index, x, y)
+    local cards = {unpack(pile.cards, index)}
+    pile.cards = {unpack(pile.cards, 1, index - 1)}
+    local first = cards[1]
+	held = {
+		mouseInCardX = x - first.x,
+		mouseInCardY = y - first.y,
+		cards = cards,
+        card = first,
+		takenFrom = pile,
+	}
+    held.prevCoords = {}
+    for _, card in ipairs(cards) do
+        table.insert(held.prevCoords, {x = card.x, y = card.y})
+    end
+end
+
 function Hold.holdTopFromPile(x, y, pile)
 	local card = table.remove(pile.cards)
 	held = {
@@ -25,23 +42,27 @@ function Hold.releaseHeld(newTargetPile)
 		return
 	end
 	if not newTargetPile then
-		held.card.x = held.prevX
-		held.card.y = held.prevY
-		table.insert(held.takenFrom.cards, held.card)
+        for index, card in ipairs(held.cards) do
+            card.x = held.prevCoords[index].x
+            card.y = held.prevCoords[index].y
+            table.insert(held.takenFrom.cards, card)
+        end
 	else
 		local canBePutted = false
 		local last = newTargetPile.cards[#newTargetPile.cards]
 		if last then
 			if (held.card:isRedSuit() and last:isBlackSuit()) or (held.card:isBlackSuit() and last:isRedSuit()) then
-				canBePutted = true
+                if held.card.no == last.no - 1 then
+                    canBePutted = true
+                end
 			end
 		end
-		if canBePutted and held.card.no == last.no - 1 then
-			held.card.isRevealed = true
-			held.card.x = newTargetPile.placeholder.x
-			held.card.y = newTargetPile.placeholder.y + (held.card.YSPACING * #newTargetPile.cards)
-			held.card:unsetUnderTopTableauCard()
-			table.insert(newTargetPile.cards, held.card)
+		if canBePutted then
+            for _, card in ipairs(held.cards) do
+                card.x = newTargetPile.placeholder.x
+                card.y = newTargetPile.placeholder.y + (card.YSPACING * #newTargetPile.cards)
+                table.insert(newTargetPile.cards, card)
+            end
 			if #held.takenFrom.cards ~= 0 then
 				for _, card in ipairs(held.takenFrom.cards) do
 					card:setUnderTopTableauCard()
@@ -50,9 +71,11 @@ function Hold.releaseHeld(newTargetPile)
 				held.takenFrom.cards[#held.takenFrom.cards]:unsetUnderTopTableauCard()
 			end
 		else
-			held.card.x = held.prevX
-			held.card.y = held.prevY
-			table.insert(held.takenFrom.cards, held.card)
+            for index, card in ipairs(held.cards) do
+                card.x = held.prevCoords[index].x
+                card.y = held.prevCoords[index].y
+                table.insert(held.takenFrom.cards, card)
+            end
 		end
 	end
 	held = nil
@@ -62,14 +85,18 @@ function Hold.mouseMoved(x, y)
 	if not held then
 		return
 	end
-	held.card.x = x - held.mouseInCardX
-	held.card.y = y - held.mouseInCardY
+    for index, card in ipairs(held.cards) do
+        card.x = x - held.mouseInCardX
+        card.y = (y - held.mouseInCardY) + ((index - 1) * card.YSPACING)
+    end
 end
 
 function Hold.draw()
 	if not held then
 		return
 	end
-	love.graphics.draw(held.card:getImg(), held.card.x, held.card.y)
+    for _, card in ipairs(held.cards) do
+        love.graphics.draw(card:getImg(), card.x, card.y)
+    end
 end
 return Hold
