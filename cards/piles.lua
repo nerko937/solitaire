@@ -203,9 +203,9 @@ function Piles.mouseReleased(x, y, button)
 		end
 	end
 	if biggestArea == 0 then
-		Hold.releaseHeld()
+		Hold.resetHeld()
 	else
-		Hold.releaseHeld(biggestAreaObj)
+		Hold.releaseHeldTo(biggestAreaObj)
 		for _, card in ipairs(biggestAreaObj.cards) do
 			card:setUnderTopTableauCard()
 		end

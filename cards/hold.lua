@@ -37,45 +37,49 @@ function Hold.getHeldCard()
 	return held.card
 end
 
-function Hold.releaseHeld(newTargetPile)
+function Hold.resetHeld()
 	if not held then
 		return
 	end
-	if not newTargetPile then
+	for index, card in ipairs(held.cards) do
+		card.x = held.prevCoords[index].x
+		card.y = held.prevCoords[index].y
+		table.insert(held.takenFrom.cards, card)
+	end
+	held = nil
+end
+
+function Hold.releaseHeldTo(newTargetPile)
+	if not held then
+		return
+	end
+	local canBePutted = false
+	local last = newTargetPile.cards[#newTargetPile.cards]
+	if last then
+		if (held.card:isRedSuit() and last:isBlackSuit()) or (held.card:isBlackSuit() and last:isRedSuit()) then
+			if held.card.no == last.no - 1 then
+				canBePutted = true
+			end
+		end
+	end
+	if canBePutted then
+		for _, card in ipairs(held.cards) do
+			card.x = newTargetPile.placeholder.x
+			card.y = newTargetPile.placeholder.y + (card.YSPACING * #newTargetPile.cards)
+			table.insert(newTargetPile.cards, card)
+		end
+		if #held.takenFrom.cards ~= 0 then
+			for _, card in ipairs(held.takenFrom.cards) do
+				card:setUnderTopTableauCard()
+			end
+			held.takenFrom.cards[#held.takenFrom.cards].isRevealed = true
+			held.takenFrom.cards[#held.takenFrom.cards]:unsetUnderTopTableauCard()
+		end
+	else
 		for index, card in ipairs(held.cards) do
 			card.x = held.prevCoords[index].x
 			card.y = held.prevCoords[index].y
 			table.insert(held.takenFrom.cards, card)
-		end
-	else
-		local canBePutted = false
-		local last = newTargetPile.cards[#newTargetPile.cards]
-		if last then
-			if (held.card:isRedSuit() and last:isBlackSuit()) or (held.card:isBlackSuit() and last:isRedSuit()) then
-				if held.card.no == last.no - 1 then
-					canBePutted = true
-				end
-			end
-		end
-		if canBePutted then
-			for _, card in ipairs(held.cards) do
-				card.x = newTargetPile.placeholder.x
-				card.y = newTargetPile.placeholder.y + (card.YSPACING * #newTargetPile.cards)
-				table.insert(newTargetPile.cards, card)
-			end
-			if #held.takenFrom.cards ~= 0 then
-				for _, card in ipairs(held.takenFrom.cards) do
-					card:setUnderTopTableauCard()
-				end
-				held.takenFrom.cards[#held.takenFrom.cards].isRevealed = true
-				held.takenFrom.cards[#held.takenFrom.cards]:unsetUnderTopTableauCard()
-			end
-		else
-			for index, card in ipairs(held.cards) do
-				card.x = held.prevCoords[index].x
-				card.y = held.prevCoords[index].y
-				table.insert(held.takenFrom.cards, card)
-			end
 		end
 	end
 	held = nil
