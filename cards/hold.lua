@@ -61,6 +61,10 @@ function Hold.releaseHeldTo(newTargetPile)
 				canBePutted = true
 			end
 		end
+    else
+        if held.card.no == 13 then
+            canBePutted = true
+        end
 	end
 	if canBePutted then
 		for _, card in ipairs(held.cards) do

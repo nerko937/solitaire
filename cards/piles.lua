@@ -209,7 +209,10 @@ function Piles.mouseReleased(x, y, button)
 		for _, card in ipairs(biggestAreaObj.cards) do
 			card:setUnderTopTableauCard()
 		end
-		biggestAreaObj.cards[#biggestAreaObj.cards]:unsetUnderTopTableauCard()
+		local top = biggestAreaObj.cards[#biggestAreaObj.cards]
+        if top then
+            top:unsetUnderTopTableauCard()
+        end
 	end
 end
 
