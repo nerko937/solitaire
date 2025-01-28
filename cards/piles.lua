@@ -4,33 +4,39 @@ love.graphics.setDefaultFilter("nearest")
 local placeholder = love.graphics.newImage("assets/Placeholder.png")
 local WIDTH, _ = love.graphics.getDimensions()
 
-local stock, waste, heartsFoundation, clubsFoundation, diamondsFoundation, spadesFoundation, tableaus
+local stock, waste, heartsFoundation, clubsFoundation, diamondsFoundation, spadesFoundation, tableaus, tableausAndFoundations
 
 local function initPiles()
 	local step = WIDTH / 7
 	local start = (step - (placeholder:getWidth())) / 2
 	local deck = require("cards.deck")
 	stock = {
+		isTableau = false,
 		cards = {},
 		placeholder = Card:new(nil, start, start, nil, nil, placeholder, true),
 	}
 	waste = {
+		isTableau = false,
 		cards = {},
 		placeholder = Card:new(nil, start + step, start, nil, nil, placeholder, true),
 	}
 	heartsFoundation = {
+		isTableau = false,
 		cards = {},
 		placeholder = Card:new(nil, start + step * 3, start, nil, nil, placeholder, true),
 	}
 	clubsFoundation = {
+		isTableau = false,
 		cards = {},
 		placeholder = Card:new(nil, start + step * 4, start, nil, nil, placeholder, true),
 	}
 	diamondsFoundation = {
+		isTableau = false,
 		cards = {},
 		placeholder = Card:new(nil, start + step * 5, start, nil, nil, placeholder, true),
 	}
 	spadesFoundation = {
+		isTableau = false,
 		cards = {},
 		placeholder = Card:new(nil, start + step * 6, start, nil, nil, placeholder, true),
 	}
@@ -38,6 +44,7 @@ local function initPiles()
 	tableaus = {}
 	for i = start, WIDTH, step do
 		table.insert(tableaus, {
+			isTableau = true,
 			cards = {},
 			placeholder = Card:new(nil, i, secRowY, nil, nil, placeholder, true),
 		})
@@ -59,6 +66,14 @@ local function initPiles()
 		card.x = stock.placeholder.x
 		card.y = stock.placeholder.y
 	end
+	tableausAndFoundations = {}
+	for _, tableau in ipairs(tableaus) do
+		table.insert(tableausAndFoundations, tableau)
+	end
+	table.insert(tableausAndFoundations, heartsFoundation)
+	table.insert(tableausAndFoundations, clubsFoundation)
+	table.insert(tableausAndFoundations, diamondsFoundation)
+	table.insert(tableausAndFoundations, spadesFoundation)
 	stock.cards = deck
 end
 initPiles()
@@ -112,25 +127,18 @@ function Piles.draw()
 		end
 	end
 
-	local function drawStock()
-		local top = stock.cards[#stock.cards]
-		if top then
-			love.graphics.draw(top:getImg(), top.x, top.y)
-		end
-	end
-
-	local function drawWaste()
-		local index = #waste.cards
-		if index > 0 then
-			local card = waste.cards[index]
-			love.graphics.draw(card:getImg(), card.x, card.y)
+	local function drawOtherPiles()
+		for _, pile in ipairs({ stock, waste, heartsFoundation, clubsFoundation, diamondsFoundation, spadesFoundation }) do
+			local top = pile.cards[#pile.cards]
+			if top then
+				love.graphics.draw(top:getImg(), top.x, top.y)
+			end
 		end
 	end
 
 	drawCardPlaceholders()
 	drawTableaus()
-	drawStock()
-	drawWaste()
+	drawOtherPiles()
 end
 
 local function overlappingArea(first, sec)
@@ -190,29 +198,31 @@ function Piles.mouseReleased(x, y, button)
 	end
 	local biggestAreaObj, biggestArea, held = nil, 0, Hold.getHeldCard()
 	if held then
-		for _, tableau in ipairs(tableaus) do
-			local target = tableau.cards[#tableau.cards]
+		for _, pile in ipairs(tableausAndFoundations) do
+			local target = pile.cards[#pile.cards]
 			if not target then
-				target = tableau.placeholder
+				target = pile.placeholder
 			end
 			local area = overlappingArea(held, target)
 			if area > biggestArea then
 				biggestArea = area
-				biggestAreaObj = tableau
+				biggestAreaObj = pile
 			end
 		end
 	end
 	if biggestArea == 0 then
 		Hold.resetHeld()
-	else
-		Hold.releaseHeldTo(biggestAreaObj)
+	elseif biggestAreaObj.isTableau then
+		Hold.releaseHeldToTableau(biggestAreaObj)
 		for _, card in ipairs(biggestAreaObj.cards) do
 			card:setUnderTopTableauCard()
 		end
 		local top = biggestAreaObj.cards[#biggestAreaObj.cards]
-        if top then
-            top:unsetUnderTopTableauCard()
-        end
+		if top then
+			top:unsetUnderTopTableauCard()
+		end
+	else
+		Hold.releaseHeldToFoundation(biggestAreaObj)
 	end
 end
 

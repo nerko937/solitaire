@@ -49,44 +49,73 @@ function Hold.resetHeld()
 	held = nil
 end
 
-function Hold.releaseHeldTo(newTargetPile)
+function Hold.releaseHeldToTableau(tableau)
 	if not held then
 		return
 	end
 	local canBePutted = false
-	local last = newTargetPile.cards[#newTargetPile.cards]
+	local last = tableau.cards[#tableau.cards]
 	if last then
 		if (held.card:isRedSuit() and last:isBlackSuit()) or (held.card:isBlackSuit() and last:isRedSuit()) then
 			if held.card.no == last.no - 1 then
 				canBePutted = true
 			end
 		end
-    else
-        if held.card.no == 13 then
-            canBePutted = true
-        end
+	else
+		if held.card.no == 13 then
+			canBePutted = true
+		end
 	end
 	if canBePutted then
 		for _, card in ipairs(held.cards) do
-			card.x = newTargetPile.placeholder.x
-			card.y = newTargetPile.placeholder.y + (card.YSPACING * #newTargetPile.cards)
-			table.insert(newTargetPile.cards, card)
+			card.x = tableau.placeholder.x
+			card.y = tableau.placeholder.y + (card.YSPACING * #tableau.cards)
+			table.insert(tableau.cards, card)
 		end
-		if #held.takenFrom.cards ~= 0 then
+		if #held.takenFrom.cards ~= 0 and held.takenFrom.isTableau then
 			for _, card in ipairs(held.takenFrom.cards) do
 				card:setUnderTopTableauCard()
 			end
 			held.takenFrom.cards[#held.takenFrom.cards].isRevealed = true
 			held.takenFrom.cards[#held.takenFrom.cards]:unsetUnderTopTableauCard()
 		end
+		held = nil
 	else
-		for index, card in ipairs(held.cards) do
-			card.x = held.prevCoords[index].x
-			card.y = held.prevCoords[index].y
-			table.insert(held.takenFrom.cards, card)
-		end
+		Hold.resetHeld()
 	end
-	held = nil
+end
+
+function Hold.releaseHeldToFoundation(foundation)
+	if not held then
+		return
+	end
+	if #held.cards > 1 then
+		Hold.resetHeld()
+		return
+	end
+	local canBePutted = false
+	local last = foundation.cards[#foundation.cards]
+	if held.card.no == 1 and not last then
+		canBePutted = true
+	end
+	if last and (held.card.no == last.no + 1 and held.card.suit == last.suit) then
+		canBePutted = true
+	end
+	if canBePutted then
+		held.card.x = foundation.placeholder.x
+		held.card.y = foundation.placeholder.y
+		table.insert(foundation.cards, held.card)
+		if #held.takenFrom.cards ~= 0 and held.takenFrom.isTableau then
+			for _, card in ipairs(held.takenFrom.cards) do
+				card:setUnderTopTableauCard()
+			end
+			held.takenFrom.cards[#held.takenFrom.cards].isRevealed = true
+			held.takenFrom.cards[#held.takenFrom.cards]:unsetUnderTopTableauCard()
+		end
+		held = nil
+	else
+		Hold.resetHeld()
+	end
 end
 
 function Hold.mouseMoved(x, y)
