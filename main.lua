@@ -3,8 +3,7 @@ local Piles = require("cards.piles")
 local Hold = require("cards.hold")
 require("background")
 
-local CANVAS_WIDTH = 266
-local CANVAS_HEIGHT = 200
+local WIDTH, HEIGHT = love.graphics.getDimensions()
 
 function love.load()
 	love.window.setFullscreen(true)
@@ -13,7 +12,7 @@ end
 function love.update(dt) end
 
 function love.draw()
-	TLfres.beginRendering(CANVAS_WIDTH, CANVAS_HEIGHT)
+	TLfres.beginRendering(WIDTH, HEIGHT)
 	DrawBackground()
 	Piles.draw()
 	Hold.draw()
@@ -21,16 +20,16 @@ function love.draw()
 end
 
 function love.mousepressed(_, _, button)
-	local x, y = TLfres.getMousePosition(CANVAS_WIDTH, CANVAS_HEIGHT)
+	local x, y = TLfres.getMousePosition(WIDTH, HEIGHT)
 	Piles.mousePressed(x, y, button)
 end
 
 function love.mousereleased(_, _, button)
-	local x, y = TLfres.getMousePosition(CANVAS_WIDTH, CANVAS_HEIGHT)
+	local x, y = TLfres.getMousePosition(WIDTH, HEIGHT)
 	Piles.mouseReleased(x, y, button)
 end
 
 function love.mousemoved(x, y)
-	local x, y = TLfres.getMousePosition(CANVAS_WIDTH, CANVAS_HEIGHT)
+	local x, y = TLfres.getMousePosition(WIDTH, HEIGHT)
 	Hold.mouseMoved(x, y)
 end
