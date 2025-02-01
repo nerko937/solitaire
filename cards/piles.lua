@@ -1,48 +1,48 @@
-Card = require("cards.card")
-Hold = require("cards.hold")
+local Card = require("cards.card")
+local Hold = require("cards.hold")
 love.graphics.setDefaultFilter("nearest")
-local placeholder = love.graphics.newImage("assets/Placeholder.png")
-local WIDTH, _ = love.graphics.getDimensions()
+local placeholder = love.graphics.newImage("assets/placeholder.png")
+local WIDTH = 720
 
 local stock, waste, heartsFoundation, clubsFoundation, diamondsFoundation, spadesFoundation, tableaus, tableausAndFoundations
 
 local function initPiles()
 	local step = WIDTH / 7
-	local start = (step - (placeholder:getWidth())) / 2
+    local yGap = 50
 	local deck = require("cards.deck")
 	stock = {
 		isTableau = false,
 		cards = {},
-		placeholder = Card:new(nil, start, start, nil, nil, placeholder, true),
+		placeholder = Card:new(nil, 0, yGap, nil, nil, placeholder, true),
 	}
 	waste = {
 		isTableau = false,
 		cards = {},
-		placeholder = Card:new(nil, start + step, start, nil, nil, placeholder, true),
+		placeholder = Card:new(nil, step, yGap, nil, nil, placeholder, true),
 	}
 	heartsFoundation = {
 		isTableau = false,
 		cards = {},
-		placeholder = Card:new(nil, start + step * 3, start, nil, nil, placeholder, true),
+		placeholder = Card:new(nil, step * 3, yGap, nil, nil, placeholder, true),
 	}
 	clubsFoundation = {
 		isTableau = false,
 		cards = {},
-		placeholder = Card:new(nil, start + step * 4, start, nil, nil, placeholder, true),
+		placeholder = Card:new(nil, step * 4, yGap, nil, nil, placeholder, true),
 	}
 	diamondsFoundation = {
 		isTableau = false,
 		cards = {},
-		placeholder = Card:new(nil, start + step * 5, start, nil, nil, placeholder, true),
+		placeholder = Card:new(nil, step * 5, yGap, nil, nil, placeholder, true),
 	}
 	spadesFoundation = {
 		isTableau = false,
 		cards = {},
-		placeholder = Card:new(nil, start + step * 6, start, nil, nil, placeholder, true),
+		placeholder = Card:new(nil, step * 6, yGap, nil, nil, placeholder, true),
 	}
-	local secRowY = (start * 3) + (placeholder:getHeight())
+	local secRowY = (yGap * 2) + placeholder:getHeight()
 	tableaus = {}
-	for i = start, WIDTH, step do
+	for i = 0, WIDTH, step do
 		table.insert(tableaus, {
 			isTableau = true,
 			cards = {},
@@ -91,7 +91,6 @@ Piles = {}
 
 function Piles.draw()
 	local function drawCardPlaceholders()
-		love.graphics.setColor(love.math.colorFromBytes(0, 51, 0))
 		love.graphics.draw(
 			heartsFoundation.placeholder:getImg(),
 			heartsFoundation.placeholder.x,
@@ -119,7 +118,6 @@ function Piles.draw()
 	end
 
 	local function drawTableaus()
-		love.graphics.setColor(1, 1, 1)
 		for _, tableau in ipairs(tableaus) do
 			for _, card in ipairs(tableau.cards) do
 				love.graphics.draw(card:getImg(), card.x, card.y)

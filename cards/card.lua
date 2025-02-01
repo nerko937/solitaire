@@ -1,5 +1,6 @@
 love.graphics.setDefaultFilter("nearest")
-local back = love.graphics.newImage("assets/Backs/back_0.png")
+local back = love.graphics.newImage("assets/card_back.png")
+local YSPACINNG = back:getHeight() / 3.3
 
 Card = {}
 
@@ -14,7 +15,7 @@ function Card:new(o, x, y, no, suit, img, isRevealed)
 	o._h = back:getHeight()
 	o.isRevealed = isRevealed or false
 	o._isUnderTopTableauCard = false
-	o.YSPACING = 7
+	o.YSPACING = YSPACINNG
 	setmetatable(o, self)
 	self.__index = self
 	return o
@@ -47,11 +48,11 @@ function Card:getImg()
 end
 
 function Card:isRedSuit()
-	return self.suit == "Hearts" or self.suit == "Diamonds"
+	return self.suit == "heart" or self.suit == "diamond"
 end
 
 function Card:isBlackSuit()
-	return self.suit == "Clubs" or self.suit == "Spades"
+	return self.suit == "club" or self.suit == "spade"
 end
 
 function Card:beenClicked(clickX, clickY)
