@@ -1,12 +1,15 @@
 local TLfres = require("tlfres")
+require("background")
 local Piles = require("cards.piles")
 local Hold = require("cards.hold")
-require("background")
+local GameOver = require("gameOver")
 
 local CANVAS_WIDTH = 720
 local CANVAS_HEIGHT = 1280
 
-function love.load() end
+function love.load()
+	Piles.recreate()
+end
 
 function love.update(dt) end
 
@@ -15,11 +18,13 @@ function love.draw()
 	DrawBackground()
 	Piles.draw()
 	Hold.draw()
+	GameOver.draw()
 	TLfres.endRendering()
 end
 
 function love.mousepressed(_, _, button)
 	local x, y = TLfres.getMousePosition(CANVAS_WIDTH, CANVAS_HEIGHT)
+	GameOver.mousePressed(x, y, button)
 	Piles.mousePressed(x, y, button)
 end
 

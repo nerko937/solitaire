@@ -1,15 +1,18 @@
+require("cards.deck")
 local Card = require("cards.card")
 local Hold = require("cards.hold")
 love.graphics.setDefaultFilter("nearest")
 local placeholder = love.graphics.newImage("assets/placeholder.png")
 local WIDTH = 720
 
-local stock, waste, heartsFoundation, clubsFoundation, diamondsFoundation, spadesFoundation, tableaus, tableausAndFoundations
+local stock, waste, heartsFoundation, clubsFoundation, diamondsFoundation, spadesFoundation, tableaus, foundations, tableausAndFoundations
 
-local function initPiles()
+Piles = {}
+
+function Piles.recreate()
 	local step = WIDTH / 7
-    local yGap = 50
-	local deck = require("cards.deck")
+	local yGap = 50
+	local deck = GetFreshDeck()
 	stock = {
 		isTableau = false,
 		cards = {},
@@ -66,17 +69,20 @@ local function initPiles()
 		card.x = stock.placeholder.x
 		card.y = stock.placeholder.y
 	end
+	foundations = {}
+	table.insert(foundations, heartsFoundation)
+	table.insert(foundations, clubsFoundation)
+	table.insert(foundations, diamondsFoundation)
+	table.insert(foundations, spadesFoundation)
 	tableausAndFoundations = {}
 	for _, tableau in ipairs(tableaus) do
 		table.insert(tableausAndFoundations, tableau)
 	end
-	table.insert(tableausAndFoundations, heartsFoundation)
-	table.insert(tableausAndFoundations, clubsFoundation)
-	table.insert(tableausAndFoundations, diamondsFoundation)
-	table.insert(tableausAndFoundations, spadesFoundation)
+	for _, foundation in ipairs(foundations) do
+		table.insert(tableausAndFoundations, foundation)
+	end
 	stock.cards = deck
 end
-initPiles()
 
 local function reverseTable(t)
 	local reversedTable = {}
@@ -86,8 +92,6 @@ local function reverseTable(t)
 	end
 	return reversedTable
 end
-
-Piles = {}
 
 function Piles.draw()
 	local function drawCardPlaceholders()
@@ -221,6 +225,13 @@ function Piles.mouseReleased(x, y, button)
 		end
 	else
 		Hold.releaseHeldToFoundation(biggestAreaObj)
+		local totalInFoundations = 0
+		for _, foundation in ipairs(foundations) do
+			totalInFoundations = totalInFoundations + #foundation.cards
+		end
+		if totalInFoundations == 52 then
+			GameOver.isGameOver = true
+		end
 	end
 end
 
