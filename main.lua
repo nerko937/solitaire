@@ -8,6 +8,7 @@ local CANVAS_WIDTH = 720
 local CANVAS_HEIGHT = 1280
 
 function love.load()
+	love.window.setFullscreen(true)
 	Piles.recreate()
 end
 
