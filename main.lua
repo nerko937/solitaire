@@ -10,7 +10,7 @@ local CANVAS_HEIGHT = 1280
 function love.load()
 	love.window.setFullscreen(true)
 	Piles.recreate()
-    love.window.setMode(0, 0)
+    love.graphics.scale(1/love.window.getDPIScale())
     mx = 0
     my = 0
     tx = 0
