@@ -8,7 +8,6 @@ local CANVAS_WIDTH = 720
 local CANVAS_HEIGHT = 1280
 
 function love.load()
-    love.graphics.scale(1/love.window.getDPIScale())
 	Piles.recreate()
     mx = 0
     my = 0
@@ -19,6 +18,7 @@ end
 function love.update(dt) end
 
 function love.draw()
+    love.graphics.scale(1/love.window.getDPIScale())
 	TLfres.beginRendering(CANVAS_WIDTH, CANVAS_HEIGHT)
 	DrawBackground()
 	Piles.draw()
