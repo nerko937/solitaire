@@ -6,8 +6,7 @@ local font = love.graphics.setNewFont("assets/Milky Week.ttf", 100)
 local fontH = font:getHeight()
 love.graphics.setFont(font)
 
-local WIDTH, HEIGHT = love.graphics.getDimensions()
-local textYGap = 50
+local HEIGHT, WIDTH, textYGap = 1280, 720, 50
 
 local congrats = { text = "Congratulations!", y = (HEIGHT - ((fontH * 2) + textYGap)) / 2 }
 congrats.textW = font:getWidth(congrats.text)

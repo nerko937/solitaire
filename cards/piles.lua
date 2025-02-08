@@ -3,7 +3,7 @@ local Card = require("cards.card")
 local Hold = require("cards.hold")
 love.graphics.setDefaultFilter("nearest")
 local placeholder = love.graphics.newImage("assets/placeholder.png")
-local WIDTH, _ = love.graphics.getDimensions()
+local WIDTH = 720
 
 local stock, waste, heartsFoundation, clubsFoundation, diamondsFoundation, spadesFoundation, tableaus, foundations, tableausAndFoundations
 
