@@ -3,14 +3,13 @@ local Card = require("cards.card")
 local Hold = require("cards.hold")
 love.graphics.setDefaultFilter("nearest")
 local placeholder = love.graphics.newImage("assets/placeholder.png")
-local WIDTH = 720
 
 local stock, waste, heartsFoundation, clubsFoundation, diamondsFoundation, spadesFoundation, tableaus, foundations, tableausAndFoundations
 
 Piles = {}
 
-function Piles.recreate()
-	local step = WIDTH / 7
+function Piles.recreate(width)
+	local step = width / 7
 	local yGap = 50
 	local deck = GetFreshDeck()
 	stock = {
@@ -45,7 +44,7 @@ function Piles.recreate()
 	}
 	local secRowY = (yGap * 2) + placeholder:getHeight()
 	tableaus = {}
-	for i = 0, WIDTH, step do
+	for i = 0, width, step do
 		table.insert(tableaus, {
 			isTableau = true,
 			cards = {},

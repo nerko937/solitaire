@@ -1,14 +1,21 @@
-local TLfres = require("tlfres")
+local push = require "push"
 require("background")
 local Piles = require("cards.piles")
 local Hold = require("cards.hold")
 -- local GameOver = require("gameOver")
 
-local CANVAS_WIDTH = 720
-local CANVAS_HEIGHT = 1280
+local gameWidth, gameHeight = 720, 1280 --fixed game resolution
+local windowWidth, windowHeight = love.window.getDesktopDimensions()
+
+push:setupScreen(gameWidth, gameHeight, windowWidth, windowHeight, {fullscreen = true, resizable = false})
+
+function love.resize(w, h)
+  return push:resize(w, h)
+end
 
 function love.load()
-	Piles.recreate()
+    -- GameOver.createTextObjs(push:getWidth(), push:getHeight())
+	Piles.recreate(push:getWidth())
     mx = 0
     my = 0
     tx = 0
@@ -18,8 +25,8 @@ end
 function love.update(dt) end
 
 function love.draw()
-    love.graphics.scale(1/love.window.getDPIScale())
-	TLfres.beginRendering(CANVAS_WIDTH, CANVAS_HEIGHT)
+    push:start()
+    -- love.graphics.scale(1/love.window.getDPIScale())
 	DrawBackground()
 	Piles.draw()
 	Hold.draw()
@@ -41,28 +48,28 @@ function love.draw()
 	love.graphics.print ('mouse.y '.. my, x, y+9*14)
 	love.graphics.print ('touch.x '.. tx, x, y+10*14)
 	love.graphics.print ('touch.y '.. ty, x, y+11*14)
-	TLfres.endRendering()
+    push:finish()
 end
 
-function love.mousepressed(_, _, button)
-	local x, y = TLfres.getMousePosition(CANVAS_WIDTH, CANVAS_HEIGHT)
+function love.mousepressed(x, y, button)
+    x, y = push:toGame(x, y)
 	-- GameOver.mousePressed(x, y, button)
 	Piles.mousePressed(x, y, button)
     mx = x
     my = y
 end
 
-function love.touchpressed( id, x, y, dx, dy, pressure )
-    tx = x
-    ty = y
-end
+-- function love.touchpressed( id, x, y, dx, dy, pressure )
+--     tx = x
+--     ty = y
+-- end
 
-function love.mousereleased(_, _, button)
-	local x, y = TLfres.getMousePosition(CANVAS_WIDTH, CANVAS_HEIGHT)
+function love.mousereleased(x, y, button)
+    x, y = push:toGame(x, y)
 	Piles.mouseReleased(x, y, button)
 end
 
-function love.mousemoved(_, _)
-	local x, y = TLfres.getMousePosition(CANVAS_WIDTH, CANVAS_HEIGHT)
+function love.mousemoved(x, y)
+    x, y = push:toGame(x, y)
 	Hold.mouseMoved(x, y)
 end

@@ -6,17 +6,21 @@ local font = love.graphics.setNewFont("assets/Milky Week.ttf", 100)
 local fontH = font:getHeight()
 love.graphics.setFont(font)
 
-local HEIGHT, WIDTH, textYGap = 1280, 720, 50
+local textYGap = 50
 
-local congrats = { text = "Congratulations!", y = (HEIGHT - ((fontH * 2) + textYGap)) / 2 }
-congrats.textW = font:getWidth(congrats.text)
-congrats.x = (WIDTH - congrats.textW) / 2
+local congrats, playAgain
 
-local playAgain = {
-	text = "Play Again?",
-	x = (WIDTH - font:getWidth("Play Again?")) / 2,
-	y = congrats.y + textYGap + fontH,
-}
+function GameOver.createTextObjs(width, height)
+    congrats = { text = "Congratulations!", y = (height - ((fontH * 2) + textYGap)) / 2 }
+    congrats.textW = font:getWidth(congrats.text)
+    congrats.x = (width - congrats.textW) / 2
+    playAgain = {
+        text = "Play Again?",
+        x = (width - font:getWidth("Play Again?")) / 2,
+        y = congrats.y + textYGap + fontH,
+    }
+end
+
 
 function GameOver.draw()
 	if not GameOver.isGameOver then
