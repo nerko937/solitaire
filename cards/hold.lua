@@ -18,18 +18,6 @@ function Hold.holdFrom(pile, index, x, y)
 	end
 end
 
-function Hold.holdTopFromPile(x, y, pile)
-	local card = table.remove(pile.cards)
-	held = {
-		mouseInCardX = x - card.x,
-		mouseInCardY = y - card.y,
-		card = card,
-		takenFrom = pile,
-		prevX = card.x,
-		prevY = card.y,
-	}
-end
-
 function Hold.getHeldCard()
 	if not held then
 		return nil
