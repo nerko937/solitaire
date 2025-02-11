@@ -5,9 +5,6 @@ love.graphics.setDefaultFilter("nearest")
 local placeholder = love.graphics.newImage("assets/placeholder.png")
 
 local stock, waste, heartsFoundation, clubsFoundation, diamondsFoundation, spadesFoundation, tableaus, foundations, tableausAndFoundations
-local cardPicked = love.audio.newSource("assets/card-slide-6.ogg", "static")
-local cardStockToWaste = love.audio.newSource("assets/card-slide-7.ogg", "static")
-local cardGoBack = love.audio.newSource("assets/error.wav", "static")
 
 Piles = {}
 
@@ -157,14 +154,14 @@ function Piles.mousePressed(x, y, button)
 			for index, card in ipairs(tableau.cards) do
 				if card.isRevealed and card:beenClicked(x, y) then
 					Hold.holdFrom(tableau, index, x, y)
-                    cardPicked:play()
+					card:playPicked()
 				end
 			end
 		end
 		local wasteTop = waste.cards[#waste.cards]
 		if wasteTop and wasteTop:beenClicked(x, y) then
 			Hold.holdFrom(waste, #waste.cards, x, y)
-            cardPicked:play()
+			wasteTop:playPicked()
 			return
 		end
 	end
@@ -174,7 +171,7 @@ function Piles.mousePressed(x, y, button)
 			return
 		end
 		local card = table.remove(stock.cards)
-        cardStockToWaste:play()
+		stock.placeholder:playMovedToWaste()
 		if card then
 			table.insert(waste.cards, card)
 			card.x = waste.placeholder.x
@@ -218,9 +215,9 @@ function Piles.mouseReleased(x, y, button)
 		end
 	end
 	if biggestArea == 0 then
-        if not stock.placeholder:beenClicked(x, y) and Hold.getHeldCard() then
-            cardGoBack:play()
-        end
+		if not stock.placeholder:beenClicked(x, y) and held then
+			held:playGoneBack()
+		end
 		Hold.resetHeld()
 	elseif biggestAreaObj.isTableau then
 		Hold.releaseHeldToTableau(biggestAreaObj)

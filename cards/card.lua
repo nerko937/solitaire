@@ -1,6 +1,12 @@
 love.graphics.setDefaultFilter("nearest")
 local back = love.graphics.newImage("assets/card_back.png")
 local YSPACINNG = back:getHeight() / 3.3
+local sounds = {
+	picked = love.audio.newSource("assets/card-slide-6.ogg", "static"),
+	placed = love.audio.newSource("assets/card-place-4.ogg", "static"),
+	goneBack = love.audio.newSource("assets/error.wav", "static"),
+	movedToWaste = love.audio.newSource("assets/card-slide-7.ogg", "static"),
+}
 
 Card = {}
 
@@ -63,6 +69,22 @@ function Card:beenClicked(clickX, clickY)
 		return false
 	end
 	return true
+end
+
+function Card:playPicked()
+	sounds.picked:play()
+end
+
+function Card:playPlaced()
+	sounds.placed:play()
+end
+
+function Card:playGoneBack()
+	sounds.goneBack:play()
+end
+
+function Card:playMovedToWaste()
+	sounds.movedToWaste:play()
 end
 
 return Card

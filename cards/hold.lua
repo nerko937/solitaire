@@ -1,7 +1,5 @@
 Hold = {}
 local held
-local cardPlace = love.audio.newSource("assets/card-place-4.ogg", "static")
-local cardGoBack = love.audio.newSource("assets/error.wav", "static")
 
 function Hold.holdFrom(pile, index, x, y)
 	local cards = { unpack(pile.cards, index) }
@@ -69,11 +67,11 @@ function Hold.releaseHeldToTableau(tableau)
 			held.takenFrom.cards[#held.takenFrom.cards].isRevealed = true
 			held.takenFrom.cards[#held.takenFrom.cards]:unsetUnderTopTableauCard()
 		end
+		held.card:playPlaced()
 		held = nil
-        cardPlace:play()
 	else
+		held.card:playGoneBack()
 		Hold.resetHeld()
-        cardGoBack:play()
 	end
 end
 
@@ -104,11 +102,11 @@ function Hold.releaseHeldToFoundation(foundation)
 			held.takenFrom.cards[#held.takenFrom.cards].isRevealed = true
 			held.takenFrom.cards[#held.takenFrom.cards]:unsetUnderTopTableauCard()
 		end
+		held.card:playPlaced()
 		held = nil
-        cardPlace:play()
 	else
+		held.card:playGoneBack()
 		Hold.resetHeld()
-        cardGoBack:play()
 	end
 end
 
