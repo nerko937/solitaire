@@ -150,7 +150,7 @@ end
 
 function Piles.mousePressed(x, y, button)
 	local function initCardMove()
-		for _, tableau in ipairs(tableaus) do
+		for _, tableau in ipairs(tableausAndFoundations) do
 			for index, card in ipairs(tableau.cards) do
 				if card.isRevealed and card:beenClicked(x, y) then
 					Hold.holdFrom(tableau, index, x, y)
