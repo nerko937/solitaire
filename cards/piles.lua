@@ -188,7 +188,7 @@ function Piles.mousePressed(x, y, button)
 		end
 	end
 
-	if button ~= 1 then
+	if button ~= 1 or not x or not y then
 		return
 	end
 
@@ -197,7 +197,7 @@ function Piles.mousePressed(x, y, button)
 end
 
 function Piles.mouseReleased(x, y, button)
-	if button ~= 1 then
+	if button ~= 1 or not x or not y then
 		return
 	end
 	local biggestAreaObj, biggestArea, held = nil, 0, Hold.getHeldCard()

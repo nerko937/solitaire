@@ -31,7 +31,7 @@ end
 
 function love.mousepressed(x, y, button)
 	x, y = push:toGame(x, y)
-	GameOver.mousePressed(x, y, button)
+	GameOver.mousePressed(x, y, button, push:getWidth())
 	Piles.mousePressed(x, y, button)
 end
 

@@ -29,11 +29,11 @@ function GameOver.draw()
 	love.graphics.print(playAgain.text, playAgain.x, playAgain.y)
 end
 
-function GameOver.mousePressed(x, y, button)
+function GameOver.mousePressed(x, y, button, width)
 	if not GameOver.isGameOver then
 		return
 	end
-	if button ~= 1 then
+	if button ~= 1 or not x or not y then
 		return
 	end
 	if x < congrats.x or x > congrats.x + congrats.textW then
@@ -42,7 +42,7 @@ function GameOver.mousePressed(x, y, button)
 	if y < congrats.y or y > playAgain.y + fontH then
 		return
 	end
-	Piles.recreate()
+	Piles.recreate(width)
 	GameOver.isGameOver = false
 end
 
