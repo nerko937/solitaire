@@ -3,6 +3,7 @@ require("background")
 local Piles = require("cards.piles")
 local Hold = require("cards.hold")
 local GameOver = require("gameOver")
+local Reset = require("reset")
 
 local gameWidth, gameHeight = 720, 1280
 local windowWidth, windowHeight = love.window.getDesktopDimensions()
@@ -14,8 +15,10 @@ function love.resize(w, h)
 end
 
 function love.load()
-	GameOver.createTextObjs(push:getWidth(), push:getHeight())
-	Piles.recreate(push:getWidth())
+	width, height = push:getDimensions()
+	GameOver.createTextObjs(width, height)
+	Reset.createObjs(width, height)
+	Piles.recreate(width)
 end
 
 function love.update(dt) end
@@ -25,13 +28,15 @@ function love.draw()
 	DrawBackground()
 	Piles.draw()
 	Hold.draw()
+	Reset.draw()
 	GameOver.draw()
 	push:finish()
 end
 
 function love.mousepressed(x, y, button)
 	x, y = push:toGame(x, y)
-	GameOver.mousePressed(x, y, button, push:getWidth())
+	GameOver.mousePressed(x, y, button, width)
+	Reset.mousePressed(x, y, button, width)
 	Piles.mousePressed(x, y, button)
 end
 

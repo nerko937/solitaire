@@ -6,18 +6,18 @@ local font = love.graphics.setNewFont("assets/Milky Week.ttf", 100)
 local fontH = font:getHeight()
 love.graphics.setFont(font)
 
-local textYGap = 50
+local TEXT_GAP = 50
 
 local congrats, playAgain
 
 function GameOver.createTextObjs(width, height)
-	congrats = { text = "Congratulations!", y = (height - ((fontH * 2) + textYGap)) / 2 }
+	congrats = { text = "Congratulations!", y = (height - ((fontH * 2) + TEXT_GAP)) / 2 }
 	congrats.textW = font:getWidth(congrats.text)
 	congrats.x = (width - congrats.textW) / 2
 	playAgain = {
 		text = "Play Again?",
 		x = (width - font:getWidth("Play Again?")) / 2,
-		y = congrats.y + textYGap + fontH,
+		y = congrats.y + TEXT_GAP + fontH,
 	}
 end
 
