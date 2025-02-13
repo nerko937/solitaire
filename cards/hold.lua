@@ -111,7 +111,7 @@ function Hold.releaseHeldToFoundation(foundation)
 end
 
 function Hold.mouseMoved(x, y)
-	if not held then
+	if not held or not x or not y then
 		return
 	end
 	for index, card in ipairs(held.cards) do
