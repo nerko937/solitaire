@@ -4,11 +4,12 @@ local Hold = require("cards.hold")
 love.graphics.setDefaultFilter("nearest")
 local placeholder = love.graphics.newImage("assets/placeholder.png")
 
-local stock, waste, heartsFoundation, clubsFoundation, diamondsFoundation, spadesFoundation, tableaus, foundations, tableausAndFoundations
+local width, stock, waste, heartsFoundation, clubsFoundation, diamondsFoundation, spadesFoundation, tableaus, foundations, tableausAndFoundations
 
 Piles = {}
 
-function Piles.recreate(width)
+function Piles.recreate(w)
+	width = w
 	local step = width / 7
 	local yGap = 50
 	local deck = GetFreshDeck()
@@ -204,6 +205,17 @@ function Piles.mousePressed(x, y, button)
 	initCardMove()
 end
 
+local title = "Congratulations!"
+local message = "Congratulations!"
+local buttons = { "Play again?" }
+
+local function congratulationsBox()
+	local pressedbutton = love.window.showMessageBox(title, message, buttons)
+	if pressedbutton == 1 then
+		Piles.recreate(width)
+	end
+end
+
 function Piles.mouseReleased(x, y, button)
 	if button ~= 1 or not x or not y then
 		return
@@ -243,7 +255,7 @@ function Piles.mouseReleased(x, y, button)
 			totalInFoundations = totalInFoundations + #foundation.cards
 		end
 		if totalInFoundations == 52 then
-			GameOver.isGameOver = true
+			congratulationsBox()
 		end
 	end
 end
