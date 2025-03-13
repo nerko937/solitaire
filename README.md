@@ -16,6 +16,6 @@ please refer to the [Love2D Getting Started Guide](https://love2d.org/wiki/Getti
  - [ ] Enable windowed mode functionality for PC platforms.
 - **Code Refactoring**
  - [ ] Consider creating a dedicated directory for external libraries, if required.
- - [ ] Refactor cards/piles.lua for consistency with cards/card.lua,
+ - [ ] Refactor `cards/piles.lua` for consistency with `cards/card.lua`,
  ensuring that piles have their own methods. For example,
  enhance the functionality to transfer cards from a pile to a hold state.
